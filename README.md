@@ -1,6 +1,6 @@
 # Dreamstate Necklace
 By Jonathan Fu
-For Dreamstate SF 2025 - Shaya's first Dreamstate :)
+> For Dreamstate SF 2025 - Shaya's first Dreamstate :)
 
 Press the 'red' button on back of Arduino board (or power cycle) to switch modes
 - Mode 1:  Necklace mode with tail chasing lights and interludes
