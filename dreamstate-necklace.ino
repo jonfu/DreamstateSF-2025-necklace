@@ -3,10 +3,11 @@
 By Jonathan Fu
 > For Dreamstate SF 2025 - Shaya's first Dreamstate :)
 
+Press the 'black' button on top of battery holder to turn it on and off
 Press the 'red' button on back of Arduino board (or power cycle) to switch modes
 - Mode 1:  Necklace mode with tail chasing lights and interludes
-- Mode 2:  POV mode with Dreamstate and Trance DJ patterns
-- Mode 3:  POV mode with eye catching and fun patterns
+- Mode 2:  POV spin mode with Dreamstate and Trance DJ patterns
+- Mode 3:  POV spin mode with eye catching and fun patterns
 
 POV = persistence of vision
 */
@@ -35,11 +36,9 @@ const long interlude = 10; //default should be 20
 
 #define VCC A3
 #define DUMMY_PIN 8 //dummy pin for neopixel library
-//#define DATA_PIN 4
 #define DATA_PIN 3
 #define CLOCK_PIN A5
-//#define GND1 7
-//define GND2 2
+
 
 #define MAX_ALL_ON 12
 #define QUARTER_MAX 4
@@ -79,14 +78,6 @@ byte mode;
 byte quarterCount = 0;
 
 #define PINKSIZE 16
-
-//const byte pinkArrayRed[PINKSIZE] =   { 0xff, 0xff, 0xfa, 0xff, 0x80 };
-//const byte pinkArrayGreen[PINKSIZE] = { 0x69, 0xcc, 0xaf, 0x00, 0x00 };
-//const byte pinkArrayBlue[PINKSIZE] =  { 0xb4, 0xff, 0xbe, 0xff, 0x80 };
-
-//const byte pinkArrayRed[PINKSIZE] =   { 0x64, 0x1a, 0x00, 0x99, 0xaa, 0xff, 0xfe};
-//const byte pinkArrayGreen[PINKSIZE] = { 0x49, 0xa1, 0xd2, 0x07, 0xee, 0x0b, 0x99};
-//const byte pinkArrayBlue[PINKSIZE] =  { 0xb0, 0x30, 0xff, 0x76, 0xdd, 0xee, 0x00};
 
 
 const byte pinkArrayRed[PINKSIZE] =   { 0xfe, 0xff, 0xf5, 0xe2, 0x7a, 0x11, 0xb3, 0x00, 0xff, 0xe5, 0xd9, 0xa6, 0x00, 0xbd, 0xe5, 0xff};
@@ -140,7 +131,6 @@ class NeoPatterns : public Adafruit_NeoPixel
     
     void begin() {
       
-      //maskMax = (STRIPSIZE-MAX_ALL_ON)/2;
       maskMax = STRIPSIZE-MAX_ALL_ON;
       
       if (STRIPSIZE%2 != 0) {
@@ -162,11 +152,6 @@ class NeoPatterns : public Adafruit_NeoPixel
     void show() {
       FastLED.show();
     }
-    
-    //uint32_t getPixelColor(uint16_t idx) {
-    //  return leds[idx];
-    //}
-    
     
     // Update the pattern
     void Update()
@@ -217,8 +202,6 @@ class NeoPatterns : public Adafruit_NeoPixel
                 case COLOR_WIPE:
                     Color2 = Color1;
                     Color1 = Wheel(random(255));
-                    //Interval = 20000;
-                    //colorWipeEven = !colorWipeEven;
 
                     if ( ++colorWipeCount % maxColorWipe == 0) {
                       colorWipeCount = 0;
@@ -243,7 +226,6 @@ class NeoPatterns : public Adafruit_NeoPixel
                     break;
                 case FADE:
                     Color1 = Wheel(random(255));
-                    //Interval = 20000;
                     break;
                 default:
                     break;
@@ -419,35 +401,8 @@ class NeoPatterns : public Adafruit_NeoPixel
         
       if (TotalSteps > MAX_ALL_ON) {
         displayFirstOfFour();
-        //blankEvenOnly(); 
       }
-        
-        
-      /*
-      
-      //two for loops only needed for blank half alternate
-      for (int i=0; i<Index; i++) {
-        setPixelColor(i, Color1);
-      }
-      for (int i=Index+1; i<TotalSteps; i++) {
-        setPixelColor(i, Color2);
-      }
-      
-      blankHalfAlternate();
-        
-        //if (colorWipeEven) {
-        //  blankEvenOnly();
-        //}
-        //else {
-        //  blankOddOnly();
-        //}
-        
-        //if (Index > MAX_ALL_ON) {
-          //for (int i=0; i<(Index-MAX_ALL_ON); i++) {
-          //  setPixelColor(i, 0);
-          //}
-       // }
-       */
+
         
         show();
         Increment();
@@ -469,47 +424,21 @@ class NeoPatterns : public Adafruit_NeoPixel
     // Update the Scanner Pattern
     void ScannerUpdate()
     { 
-        //uint32_t color2 = DimColor(Color1);
-        //uint32_t color3 = DimColor(color2);
-        //clearStrip();
       
         for (int i = 0; i < STRIPSIZE; i++)
         {
             if (i == Index)  // Scan Pixel to the right
             {
                  setPixelColor(i, Color1);
-                 
-                 /*
-                 
-                 if (i-1>=0) {
-                   setPixelColor(i-1, color2);
-                 }
-                 if (i-2>=0) {
-                   setPixelColor(i-2, color3);
-                 }       
-                 
-                 */
 
             }
             else if (i == TotalSteps - Index) // Scan Pixel to the left
             {
                  setPixelColor(i, Color2);
-                 
-                 /*
-                 
-                 if (i+1<STRIPSIZE) {
-                   setPixelColor(i+1, color2);
-                 }
-                 if (i+2<STRIPSIZE) {
-                   setPixelColor(i+2, color3);
-                 }       
-                 
-                 */
 
             }
             else // Fading tail
             {
-              //setPixelColor(i, DimColor(leds[i]));
               leds[i] = CRGB(leds[i].red >> 3, leds[i].green >> 3, leds[i].blue >> 3);
             }
         }
@@ -548,7 +477,6 @@ class NeoPatterns : public Adafruit_NeoPixel
     {
         // Shift R, G and B components one bit to the right
         uint32_t dimColor = Color(Red(color) >> 1, Green(color) >> 1, Blue(color) >> 1);
-        //uint32_t dimColor = Color(Red(color)*88/100, Green(color)*88/100, Blue(color)*88/100);
         
         return dimColor;
     }
@@ -703,33 +631,17 @@ class NeoPatterns : public Adafruit_NeoPixel
 NeoPatterns strip(STRIPSIZE, DUMMY_PIN, NEO_GRB + NEO_KHZ800, NULL);
  
 void setup() {
-  
-//      pinMode(GND1, OUTPUT);
-//      digitalWrite(GND1, LOW);  
-      
-//      pinMode(GND2, OUTPUT);
-//      pinMode(VCC, OUTPUT);
+
       pinMode(DATA_PIN, OUTPUT);
       pinMode(CLOCK_PIN, OUTPUT);
-//      digitalWrite(GND2, LOW);
-//      digitalWrite(VCC, HIGH);      
-      
-     //FastLED.addLeds<APA102,DATA_PIN,CLOCK_PIN,BGR>(leds, STRIPSIZE);
-     //FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, STRIPSIZE);
+
      FastLED.addLeds<WS2812B,DATA_PIN,GRB>(leds, STRIPSIZE);
-     //FastLED.addLeds<WS2813,DATA_PIN,GRB>(leds, STRIPSIZE);
+
      clearStrip();      
   
   mode = EEPROM.read(0);
 
    switch (mode) {
-//     case 0:
-//     EEPROM.write(0, 1);
-//
-//      set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-//      sleep_mode();   
-//   
-//     break;
      
      case 1:
      EEPROM.write(0, 2);
@@ -761,16 +673,6 @@ void setup() {
      
    }
 
-
-
-
-
-
-
-  
-
-
-
 }
  
 void loop() {
@@ -788,7 +690,6 @@ void loop() {
         if (strip.ActivePattern == THEATER_CHASE) {
           strip.Update();
         } else {
-          //strip.TheaterChase(0xff00ff, 0x22ff33, 100);
           strip.TheaterChase(strip.Wheel(random(255)), strip.Wheel(random(255)), THEATERINTERVAL);
         }
       break;
@@ -849,7 +750,6 @@ void loop() {
         int scannerIdx2 = pinkCount%PINKSIZE;        
         strip.Scanner(strip.Color(pinkArrayRed[scannerIdx1],pinkArrayGreen[scannerIdx1],pinkArrayBlue[scannerIdx1]), strip.Color(pinkArrayRed[scannerIdx2],pinkArrayGreen[scannerIdx2],pinkArrayBlue[scannerIdx2]),SCANNERINTERVAL);
     }
-    //strip.setBrightness(100);
     strip.Update();
   }
   
@@ -918,37 +818,6 @@ void colorWipeReverse(uint32_t c, uint8_t wait) {
   }
 }
 
-/*
- 
-void rainbow(uint8_t wait) {
-uint16_t i, j;
- 
-for(j=0; j<32; j++) { //original value 256
-for(i=0; i<strip.numPixels(); i++) {
-strip.setPixelColor(i, Wheel((i+j) & 255));
-}
-//strip.blankHalfAlternate();
-strip.displayQuarterAlternate();
-strip.show();
-delay(wait);
-}
-}
-
-// Slightly different, this makes the rainbow equally distributed throughout
-void rainbowCycle(uint8_t wait) {
-uint16_t i, j;
- 
-for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
-for(i=0; i< strip.numPixels(); i++) {
-strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
-}
-//strip.blankHalfAlternate();
-strip.displayQuarterAlternate();
-strip.show();
-delay(wait);
-}
-}
-*/
  
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
